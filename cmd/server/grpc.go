@@ -8,6 +8,7 @@ import (
 	grpc_validator "github.com/grpc-ecosystem/go-grpc-middleware/validator"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/infobloxopen/atlas-app-toolkit/gateway"
+	tkgorm "github.com/infobloxopen/atlas-app-toolkit/gorm"
 	"github.com/infobloxopen/atlas-app-toolkit/requestid"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -21,6 +22,11 @@ import (
 )
 
 func NewGRPCServer(logger *logrus.Logger, dbConnectionString string) (*grpc.Server, error) {
+	// create new postgres database
+	db, err := gorm.Open("postgres", dbConnectionString)
+	if err != nil {
+		return nil, err
+	}
 	grpcServer := grpc.NewServer(
 		grpc.KeepaliveParams(
 			keepalive.ServerParameters{
@@ -30,6 +36,8 @@ func NewGRPCServer(logger *logrus.Logger, dbConnectionString string) (*grpc.Serv
 		),
 		grpc.UnaryInterceptor(
 			grpc_middleware.ChainUnaryServer(
+
+				tkgorm.UnaryServerInterceptor(db),
 				// logging middleware
 				grpc_logrus.UnaryServerInterceptor(logrus.NewEntry(logger)),
 
@@ -48,11 +56,6 @@ func NewGRPCServer(logger *logrus.Logger, dbConnectionString string) (*grpc.Serv
 		),
 	)
 
-	// create new postgres database
-	db, err := gorm.Open("postgres", dbConnectionString)
-	if err != nil {
-		return nil, err
-	}
 	// register service implementation with the grpcServer
 	s, err := svc.NewBasicServer(db)
 	if err != nil {

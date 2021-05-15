@@ -1,0 +1,64 @@
+##############################  Test endpoints ###################################
+###
+GET http://localhost:8081/ping
+
+### Get swagger JSON
+GET http://localhost:8080/swagger/
+
+###Get veresion
+GET http://localhost:8080/myapp/v1/version
+
+###
+GET http://localhost:8081/ready
+
+###
+GET http://localhost:8081/healthz
+
+###
+#Create books
+POST http://localhost:8080/myapp/v1/books
+Content-Type: application/json
+
+{
+  "name": "The Three Musketeers6",
+  "price": 10.44,
+  "genre": 1,
+  "amount": 2
+}
+
+
+###
+#Update book
+PUT http://localhost:8080/myapp/v1/books/1
+Content-Type: application/json
+
+{
+  "name": "The Three Musketeers2",
+  "price": 10.44,
+  "genre": 1,
+  "amount": 4
+}
+
+###
+#Read book
+GET http://localhost:8080/myapp/v1/books/2
+Content-Type: application/json
+
+###
+#List books
+GET http://localhost:8080/myapp/v1/books
+Content-Type: application/json
+
+
+###Get books with filtering
+GET http://localhost:8080/myapp/v1/books?_filter=name=="The Three Musketeers"
+Content-Type: application/json
+
+###Get books with filtering
+GET http://localhost:8080/myapp/v1/books?_filter=genre==1
+Content-Type: application/json
+
+### Delete book
+DELETE http://localhost:8080/myapp/v1/books/6
+Content-Type: application/json
+
